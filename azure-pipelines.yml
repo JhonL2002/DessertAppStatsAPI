@@ -1,0 +1,44 @@
+trigger:
+  - main
+
+pool:
+  name: 'WindowsPrivateAgent'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: |
+    dotnet build
+    dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
+  displayName: 'Build and Publish API'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Azure-Subscription'
+    appType: webApp
+    appName: 'DessertAppStatsAPI'
+    package: '$(Build.ArtifactStagingDirectory)'
+
+- script: |
+    # Call to API and generate new content from README.md
+    curl -X GET dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
+  displayName: 'Generate updated README.md'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      git config --global user.email "jhonfredylopezarenas@gmail.com"
+      git config --global user.name "jhonl2002"
+      git clone https://$(GITHUB_PAT)@github.com/JhonL2002/DessertApp.git
+      cd DessertApp
+      Move-Item -Path ../README.md -Destination ./README.md -Force
+      git add README.md
+      git commit -m "Updated README with latest pipeline stats"
+      git push
+  env:
+    GITHUB_PAT: $(GITHUB_PERSONAL_ACCESS_TOKEN)
+  displayName: 'Push updated README.md to DessertApp repository'
