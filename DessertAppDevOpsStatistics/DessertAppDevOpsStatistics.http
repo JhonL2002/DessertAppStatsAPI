@@ -1,0 +1,6 @@
+@DessertAppDevOpsStatistics_HostAddress = http://localhost:5092
+
+GET {{DessertAppDevOpsStatistics_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
