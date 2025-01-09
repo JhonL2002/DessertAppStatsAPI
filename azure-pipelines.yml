@@ -8,9 +8,10 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '8.x'
+    version: '8.0.x'
 
 - script: |
+    dotnet --info
     dotnet build
     dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
   displayName: 'Build and Publish API'
@@ -24,7 +25,7 @@ steps:
 
 - script: |
     # Call to API and generate new content from README.md
-    curl -X GET dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
+    curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/success -o README.md
   displayName: 'Generate updated README.md'
 
 - task: PowerShell@2
