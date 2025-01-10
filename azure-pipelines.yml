@@ -33,17 +33,13 @@ steps:
           "Authorization" = "Basic $(ConvertTo-SecureString -String :$(GITHUB_PERSONAL_ACCESS_TOKEN) -AsPlainText -Force)"
       }
       
-      $response = Invoke-WebRequest -Uri $url -Headers $headers -Method Get
-      $pipelines = $response.Content | ConvertFrom-Json
-
-      #Add data format to use in README.md
-      $readmeContent = "# Last Succeeded Pipelines\n\n"
+      $readmeContent = "<h1>Last Succeeded Pipelines:History</h1><br /><br />"
       $pipelines | ForEach-Object {
-          $readmeContent += "## Pipeline ID: $_.Id\n"
-          $readmeContent += " - **Build Number**: $_.BuildNumber\n"
-          $readmeContent += " - **Status**: $_.Status\n"
-          $readmeContent += " - **Result**: $_.Result\n"
-          $readmeContent += " - **Finish Time**: $_.FinishTime\n\n"
+        $readmeContent += "<h2>Pipeline ID:$($_.Id)</h2><br />"
+        $readmeContent += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
+        $readmeContent += "<p><strong>Status:</strong> $($_.status)</p><br />"
+        $readmeContent += "<p><strong>Result:</strong> $($_.result)</p><br />"
+        $readmeContent += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
       }
 
       #Write retrieved information in the README.md
