@@ -25,7 +25,7 @@ steps:
 
 - script: |
     # Call to API and generate new content from README.md
-    curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/success -o README.md
+    curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
   displayName: 'Generate updated README.md'
 
 - task: PowerShell@2
