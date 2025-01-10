@@ -33,14 +33,29 @@ steps:
           "Authorization" = "Basic $(ConvertTo-SecureString -String :$(GITHUB_PERSONAL_ACCESS_TOKEN) -AsPlainText -Force)"
       }
       
+      # Perform GET request to fetch data
+      $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
+
+      # Inicialize README.md content
       $readmeContent = "<h1>Last Succeeded Pipelines:History</h1><br /><br />"
-      $pipelines | ForEach-Object {
-        $readmeContent += "<h2>Pipeline ID:$($_.Id)</h2><br />"
-        $readmeContent += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
-        $readmeContent += "<p><strong>Status:</strong> $($_.status)</p><br />"
-        $readmeContent += "<p><strong>Result:</strong> $($_.result)</p><br />"
-        $readmeContent += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
+
+      # Verify if response has content
+      if ($response -ne $null -and $response.Count -gt 0) {
+          $response | ForEach-Object {
+          # Fetch some details in the request
+          $readmeContent += "<h2>Pipeline ID:$($_.id)</h2><br />"
+          $readmeContent += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
+          $readmeContent += "<p><strong>Status:</strong> $($_.status)</p><br />"
+          $readmeContent += "<p><strong>Result:</strong> $($_.result)</p><br />"
+          $readmeContent += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
       }
+      } else {
+          Write-Output "There are nothing to show"
+      }
+
+      # Show generated content
+      Write-Output "Pipelines content:"
+      Write-Output $readmeContent
 
       #Write retrieved information in the README.md
       Set-Content -Path "$(Build.SourcesDirectory)/README.md" -Value $readmeContent
