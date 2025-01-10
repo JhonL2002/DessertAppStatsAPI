@@ -15,6 +15,7 @@ namespace DessertAppDevOpsStatistics.Services
         {
             try
             {
+                //To authenticate resource, you need a managed identity in Azure Key Vault
                 var keyVaultName = "dessertkeyvault";
                 var kvUri = $"https://{keyVaultName}.vault.azure.net";
                 var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());

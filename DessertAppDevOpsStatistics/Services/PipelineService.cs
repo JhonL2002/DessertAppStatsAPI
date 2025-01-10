@@ -28,12 +28,16 @@ namespace DessertAppDevOpsStatistics.Services
             var pipelineId = 5;
             var personalAccessToken = await _secretService.GetSecretFromVaultAsync();
 
+            //Define the URL API to get stats from Azure DevOps
             var url = $"https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={pipelineId}&statusFilter=completed&resultFilter=succeeded&$top=10&api-version=6.0";
 
+            //Create a client using IHttpClientFactory to send a GET request
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(
                     "Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($":{personalAccessToken}")));
+
+            //Fetch data
             try
             {
                 var response = await client.GetFromJsonAsync<PipelineResponse>(url);
