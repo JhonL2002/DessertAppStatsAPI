@@ -37,13 +37,13 @@ steps:
       $pipelines = $response.Content | ConvertFrom-Json
 
       #Add data format to use in README.md
-      $readmeContent = "Last Succeeded Pipelines\n\n"
+      $readmeContent = "<h1>Last Succeeded Pipelines</h1><br /><br />"
       $pipelines | ForEach-Object {
-          $readmeContent += "## Pipeline ID: $_.Id\n"
-          $readmeContent += " - **Build Number**: $_.BuildNumber\n"
-          $readmeContent += " - **Status**: $_.Status\n"
-          $readmeContent += " - **Result**: $_.Result\n"
-          $readmeContent += " - **Finish Time**: $_.FinishTime\n\n"
+        $readmeContent += "<h2>Pipeline ID:$_.Id</h2><br />"
+        $readmeContent += "<p><strong>Build Number:</strong>$_.BuildNumber</p><br />"
+        $readmeContent += "<p><strong>Status:</strong> $_.Status</p><br />"
+        $readmeContent += "<p><strong>Result:</strong> $_.Result</p><br />"
+        $readmeContent += "<p><strong>Finish Time:</strong> $_.FinishTime</p><br /><br />"
       }
 
       #Write retrieved information in the README.md
