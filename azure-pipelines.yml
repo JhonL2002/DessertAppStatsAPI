@@ -37,7 +37,7 @@ steps:
       $pipelines = $response.Content | ConvertFrom-Json
 
       #Add data format to use in README.md
-      $readmeContent = "# Last Succeeded Pipelines\n\n"
+      $readmeContent = "Last Succeeded Pipelines\n\n"
       $pipelines | ForEach-Object {
           $readmeContent += "## Pipeline ID: $_.Id\n"
           $readmeContent += " - **Build Number**: $_.BuildNumber\n"
