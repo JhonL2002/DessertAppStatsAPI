@@ -34,7 +34,7 @@ steps:
     script: |
       git config --global user.email "jhonfredylopezarenas@gmail.com"
       git config --global user.name "jhonl2002"
-      git clone https://$(GITHUB_PAT)@github.com/JhonL2002/DessertApp.git
+      git clone https://$env:GITHUB_PAT@github.com/JhonL2002/DessertApp.git
       cd DessertApp
       Move-Item -Path ../README.md -Destination ./README.md -Force
       git add README.md
