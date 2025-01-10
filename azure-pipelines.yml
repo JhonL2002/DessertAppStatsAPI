@@ -38,14 +38,14 @@ steps:
       $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
 
       # Generate pipeline stats
-      $pipelineStats = "<h1>📋 Last Succeeded Pipelines:History</h1><br /><br />"
+      $pipelineStats = "<h1>📋Last Succeeded Pipelines:History</h1><br /><br />"
       if ($response -ne $null -and $response.Count -gt 0) {
           $response | ForEach-Object {
-              $pipelineStats += "<h2>ℹ️ Pipeline ID:$($_.id)</h2><br />"
+              $pipelineStats += "<h2>ℹ️Pipeline ID:$($_.id)</h2><br />"
               $pipelineStats += "<p><strong>🛠 Build Number:</strong> $($_.buildNumber)</p><br />"
-              $pipelineStats += "<p><strong>ℹ️ Status:</strong><span style='color:green;'>$($_.status)</span></p><br />"
-              $pipelineStats += "<p><strong>✔️ Result:</strong> $($_.result)</p><br />"
-              $pipelineStats += "<p><strong>⌛️ Finish Time:</strong> $($_.finishTime)</p><br /><br />"
+              $pipelineStats += "<p><strong>ℹ️Status:</strong><span style='color:green;'>$($_.status)</span></p><br />"
+              $pipelineStats += "<p><strong>✔️Result:</strong> $($_.result)</p><br />"
+              $pipelineStats += "<p><strong>⌛️Finish Time:</strong> $($_.finishTime)</p><br /><br />"
           }
       } else {
           $pipelineStats += "<p>No pipeline data available.</p><br />"
