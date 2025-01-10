@@ -13,7 +13,7 @@ steps:
 - script: |
     dotnet --info
     dotnet build
-    dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
+    dotnet publish -c Release -o "$(Build.ArtifactStagingDirectory)"
   displayName: 'Build and Publish API'
 
 - task: AzureWebApp@1
@@ -21,7 +21,7 @@ steps:
     azureSubscription: 'Azure-Subscription'
     appType: webApp
     appName: 'DessertAppStatsAPI'
-    package: '$(Build.ArtifactStagingDirectory)'
+    package: "$(Build.ArtifactStagingDirectory)"
 
 - script: |
     # Call to API and generate new content from README.md
