@@ -27,38 +27,46 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      # Call to API and generate new content from README.md
+      # Ruta al archivo README.md
+      $readmePath = "$(Build.SourcesDirectory)/README.md"
+
+      # Llama a la API para obtener los datos
       $url = "https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines"
       $headers = @{
           "Authorization" = "Basic $(ConvertTo-SecureString -String :$(GITHUB_PERSONAL_ACCESS_TOKEN) -AsPlainText -Force)"
       }
-      
-      # Perform GET request to fetch data
       $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
 
-      # Inicialize README.md content
-      $readmeContent = "<h1>Last Succeeded Pipelines:History</h1><br /><br />"
-
-      # Verify if response has content
+      # Generate pipeline stats
+      $pipelineStats = "<h1>Last Succeeded Pipelines:History</h1><br /><br />"
       if ($response -ne $null -and $response.Count -gt 0) {
           $response | ForEach-Object {
-          # Fetch some details in the request
-          $readmeContent += "<h2>Pipeline ID:$($_.id)</h2><br />"
-          $readmeContent += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
-          $readmeContent += "<p><strong>Status:</strong> $($_.status)</p><br />"
-          $readmeContent += "<p><strong>Result:</strong> $($_.result)</p><br />"
-          $readmeContent += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
-      }
+              $pipelineStats += "<h2>Pipeline ID:$($_.id)</h2><br />"
+              $pipelineStats += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
+              $pipelineStats += "<p><strong>Status:</strong> $($_.status)</p><br />"
+              $pipelineStats += "<p><strong>Result:</strong> $($_.result)</p><br />"
+              $pipelineStats += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
+          }
       } else {
-          Write-Output "There are nothing to show"
+          $pipelineStats += "<p>No pipeline data available.</p><br />"
       }
+
+      # Read current content of README.md (si exists)
+      if (Test-Path $readmePath) {
+          $existingContent = Get-Content -Path $readmePath -Raw
+      } else {
+          $existingContent = "<h1>DessertApp Project .Net 8 MVC</h1><br />"
+      }
+
+      # Merge current content with stats
+      $newReadmeContent = $existingContent + "<br /><hr /><br />" + $pipelineStats
+
+      # Overwrites README.md file with new content
+      Set-Content -Path $readmePath -Value $newReadmeContent
 
       # Show generated content
-      Write-Output "Pipelines content:"
-      Write-Output $readmeContent
-
-      #Write retrieved information in the README.md
-      Set-Content -Path "$(Build.SourcesDirectory)/README.md" -Value $readmeContent
+      Write-Output "Updated README content:"
+      Write-Output $newReadmeContent
   displayName: 'Generate updated README.md with pipeline stats'
 
 - task: PowerShell@2
