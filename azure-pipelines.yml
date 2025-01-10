@@ -23,24 +23,26 @@ steps:
     appName: 'DessertAppStatsAPI'
     package: "$(Build.ArtifactStagingDirectory)"
 
-- script: |
-    # Call to API and generate new content from README.md
-    $response = curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
-    $pipelines = $response | ConvertFrom-Json
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Call to API and generate new content from README.md
+      $response = curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
+      $pipelines = $response | ConvertFrom-Json
 
-    #Add data format to use in README.md
-    $readmeContent = "# Last Succeeded Pipelines\n\n"
-    $pipelines | ForEach-Object {
-      $readmeContent += "## Pipeline ID: $_.Id\n"
-      $readmeContent += " - **Build Number**: $_.BuildNumber\n"
-      $readmeContent += " - **Status**: $_.Status\n"
-      $readmeContent += " - **Result**: $_.Result\n"
-      $readmeContent += " - **Finish Time**: $_.FinishTime\n\n"
-    }
+      #Add data format to use in README.md
+      $readmeContent = "# Last Succeeded Pipelines\n\n"
+      $pipelines | ForEach-Object {
+          $readmeContent += "## Pipeline ID: $_.Id\n"
+          $readmeContent += " - **Build Number**: $_.BuildNumber\n"
+          $readmeContent += " - **Status**: $_.Status\n"
+          $readmeContent += " - **Result**: $_.Result\n"
+          $readmeContent += " - **Finish Time**: $_.FinishTime\n\n"
+      }
 
-    #Write retrieved information in the README.md
-    Set-Content -Path "$(Build.SourcesDirectory)/README.md" -Value $readmeContent
-
+      #Write retrieved information in the README.md
+      Set-Content -Path "$(Build.SourcesDirectory)/README.md" -Value $readmeContent
   displayName: 'Generate updated README.md with pipeline stats'
 
 - task: PowerShell@2
