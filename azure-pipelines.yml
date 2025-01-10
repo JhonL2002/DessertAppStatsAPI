@@ -36,10 +36,10 @@ steps:
       $readmeContent = "<h1>Last Succeeded Pipelines:History</h1><br /><br />"
       $pipelines | ForEach-Object {
         $readmeContent += "<h2>Pipeline ID:$($_.Id)</h2><br />"
-        $readmeContent += "<p><strong>Build Number:</strong> $($_.BuildNumber)</p><br />"
-        $readmeContent += "<p><strong>Status:</strong> $($_.Status)</p><br />"
-        $readmeContent += "<p><strong>Result:</strong> $($_.Result)</p><br />"
-        $readmeContent += "<p><strong>Finish Time:</strong> $($_.FinishTime)</p><br /><br />"
+        $readmeContent += "<p><strong>Build Number:</strong> $($_.buildNumber)</p><br />"
+        $readmeContent += "<p><strong>Status:</strong> $($_.status)</p><br />"
+        $readmeContent += "<p><strong>Result:</strong> $($_.result)</p><br />"
+        $readmeContent += "<p><strong>Finish Time:</strong> $($_.finishTime)</p><br /><br />"
       }
 
       #Write retrieved information in the README.md
