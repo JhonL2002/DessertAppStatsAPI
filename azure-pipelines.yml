@@ -28,8 +28,13 @@ steps:
     targetType: 'inline'
     script: |
       # Call to API and generate new content from README.md
-      $response = curl -X GET https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines -o README.md
-      $pipelines = $response | ConvertFrom-Json
+      $url = "https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines"
+      $headers = @{
+          "Authorization" = "Basic $(ConvertTo-SecureString -String :$(GITHUB_PERSONAL_ACCESS_TOKEN) -AsPlainText -Force)"
+      }
+      
+      $response = Invoke-WebRequest -Uri $url -Headers $headers -Method Get
+      $pipelines = $response.Content | ConvertFrom-Json
 
       #Add data format to use in README.md
       $readmeContent = "# Last Succeeded Pipelines\n\n"
