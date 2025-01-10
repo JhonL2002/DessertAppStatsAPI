@@ -1,0 +1,86 @@
+trigger:
+  - main
+
+pool:
+  name: 'WindowsPrivateAgent'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+
+- script: |
+    dotnet --info
+    dotnet build
+    dotnet publish -c Release -o "$(Build.ArtifactStagingDirectory)"
+  displayName: 'Build and Publish API'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Azure-Subscription'
+    appType: webApp
+    appName: 'DessertAppStatsAPI'
+    package: "$(Build.ArtifactStagingDirectory)"
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Ruta al archivo README.md
+      $readmePath = "$(Build.SourcesDirectory)/README.md"
+
+      # Llama a la API para obtener los datos
+      $url = "https://dessertappstatsapi-ccg6eagqgkhkgpcf.brazilsouth-01.azurewebsites.net/api/pipelines/pipelines"
+      $headers = @{
+          "Authorization" = "Basic $(ConvertTo-SecureString -String :$(GITHUB_PERSONAL_ACCESS_TOKEN) -AsPlainText -Force)"
+      }
+      $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
+
+      # Generate pipeline stats
+      $pipelineStats = "<h1>&#128203; Last Succeeded Pipelines: History</h1><br /><br />"
+      if ($response -ne $null -and $response.Count -gt 0) {
+          $response | ForEach-Object {
+              $pipelineStats += "<h2>&#8505; Pipeline ID: $($_.id)</h2><br />"
+              $pipelineStats += "<p><strong>&#128295; Build Number: </strong> $($_.buildNumber)</p><br />"
+              $pipelineStats += "<p><strong>&#8505; Status: </strong><span style='color:green;'>$($_.status)</span></p><br />"
+              $pipelineStats += "<p><strong>&#9989; Result: </strong> $($_.result)</p><br />"
+              $pipelineStats += "<p><strong>&#8987; Finish Time: </strong> $($_.finishTime)</p><br /><br />"
+          }
+      } else {
+          $pipelineStats += "<p>No pipeline data available.</p><br />"
+      }
+
+      # Read current content of README.md (si exists)
+      if (Test-Path $readmePath) {
+          $existingContent = Get-Content -Path $readmePath -Raw
+      } else {
+          $existingContent = "<h1>DessertApp Project .Net 8 MVC</h1><br />"
+      }
+
+      # Merge current content with stats
+      $newReadmeContent = $existingContent + "<br /><hr /><br />" + $pipelineStats
+
+      # Overwrites README.md file with new content
+      Set-Content -Path $readmePath -Value $newReadmeContent
+
+      # Show generated content
+      Write-Output "Updated README content:"
+      Write-Output $newReadmeContent
+  displayName: 'Generate updated README.md with pipeline stats'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      git config --global user.email "jhonfredylopezarenas@gmail.com"
+      git config --global user.name "jhonl2002"
+      git clone https://$env:GITHUB_PAT@github.com/JhonL2002/DessertApp.git
+      cd DessertApp
+      Move-Item -Path ../README.md -Destination ./README.md -Force
+      git add README.md
+      git commit -m "Updated README with latest pipeline stats"
+      git push
+  env:
+    GITHUB_PAT: $(GITHUB_PERSONAL_ACCESS_TOKEN)
+  displayName: 'Push updated README.md to DessertApp repository'
